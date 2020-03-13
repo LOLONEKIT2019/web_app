@@ -1,0 +1,137 @@
+openapi: 3.0.1
+info:
+  title: IEC Tag Processor
+  description: This is a IEC Tag Processor API
+  termsOfService: http://xx.xx/xx/
+  contact:
+    email: xxx@xxx.xx
+  version: 1.0.0
+servers:
+- url: https://abc.de/v1
+- url: http://abc.de/v1
+
+tags:
+- name: health
+  description: Service health
+- name: refresh
+  description: Service restart / condition
+  
+paths:
+  /refresh:
+    get:
+      tags:
+      - refresh
+      security:
+       - bearerAuth: []
+       - basicAuth: []
+      summary: Return service condition.
+      responses:
+        200:
+          description: Ready.
+
+        202:
+          description: The process is currently running
+          headers:
+            Content-Type:
+              schema:
+                type: string
+            X-Content-Type-Options:
+               schema:
+                type: string
+            
+        423:
+          description: The process is currently being cancelled.
+          headers:
+            Content-Type:
+              schema:
+                type: string
+            X-Content-Type-Options:
+               schema:
+                type: string
+        404:
+          $ref: '#/components/responses/UnauthorizedError'
+          
+        405:
+          $ref: '#/components/responses/MethodNotAllowed'
+    post:
+      tags:
+      - refresh
+      security:
+       - bearerAuth: []
+       - basicAuth: []
+      summary: Start application.
+      description: Manual start of service.
+      responses:
+        202:
+          description: Starting application.
+          content: {}
+        423:
+          description: The process is currently running or being cancelled.
+          content: {}
+        404:
+          $ref: '#/components/responses/UnauthorizedError'
+        405:
+          $ref: '#/components/responses/MethodNotAllowed'
+    delete:
+      tags:
+      - refresh
+      security:
+       - bearerAuth: []
+       - basicAuth: []
+      summary: Stop application.
+      description: Manual stop of service.
+      responses:
+        202:
+          description: Restart application.
+          content: {}
+        423:
+          description: The process is currently running or being cancelled.
+          content: {}
+        404:
+          $ref: '#/components/responses/UnauthorizedError'
+        405:
+          $ref: '#/components/responses/MethodNotAllowed'
+  /health:
+    get:
+      tags:
+      - health
+      summary: service health
+      description: Check service health.
+      responses:
+        200:
+          description: Service works
+          content: {}
+        404:
+          description: Service fall
+          content: {}
+  /:
+    get:
+      tags:
+      - health
+      summary: service health, same as "/health"
+      description: Check service health. Same as "/health"
+      responses:
+        200:
+          description: Service works
+          content: {}
+        404:
+          description: Service fall
+          content: {}
+          
+components:
+  securitySchemes:
+    bearerAuth:           
+      type: http
+      scheme: bearer
+      bearerFormat: JWT  
+    basicAuth:     
+      type: http
+      scheme: basic
+  responses:
+    UnauthorizedError:
+      description: Access or Authentication information is missing or invalid.
+    MethodNotAllowed:
+      description: Method Not Allowed
+        
+    
+  
