@@ -1,0 +1,63 @@
+### get token
+GET http://localhost:8000/token
+Content-Type: application/json
+
+{
+  "mail" : "abcd@gmail.yahoo",
+  "password" : "adminadmin"
+}
+
+> {% client.global.set("token", response.body.jwt); %}
+
+###GO API
+GET http://localhost:8000/status
+
+###Get All users
+
+GET http://localhost:8000/users
+Authorization: Basic {{token}}
+
+### Create new user
+POST http://localhost:8000/users
+Content-Type: application/json
+Authorization: Basic {{token}}
+
+{
+  "mail" : "abcd@gmail.yahoo",
+  "password" : "adminadmin"
+}
+### Create new user
+POST http://localhost:8000/users
+Content-Type: application/json
+Authorization: Basic {{token}}
+
+{
+  "mail" : "abcd@mailss.ton",
+  "password" : "adminadmin"
+}
+
+###Get one user by id from mongodb
+GET http://localhost:8000/users/5e67a1bd6af19c18fbae0543
+Authorization: Basic {{token}}
+
+###Update user status
+PUT http://localhost:8000/users/5e67a63eda50dcbef27e5f24
+Content-Type: application/json
+Authorization: Basic {{token}}
+
+{
+  "status": "SUBSCRIBE",
+  "password": "123456789098765432"
+}
+
+### delete one user
+DELETE http://localhost:8000/users/5e67a1bd6af19c18fbae0543
+Authorization: Basic {{token}}
+
+###
+GET http://localhost:8000/token/new/status
+
+###
+
+
+

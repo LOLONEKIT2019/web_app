@@ -1,0 +1,41 @@
+###GO API
+GET http://localhost:8000/status
+
+### Create new contact
+POST http://localhost:8000/contacts/5e67a1a86af19c18fbae0542
+Content-Type: application/json
+Authorization: Basic {{token}}
+
+{
+  "name" : "Anatoliy Pavlov",
+  "phone" : "+375337312222"
+}
+### Create new contact
+POST http://localhost:8000/contacts/5e67a1a86af19c18fbae0542
+Content-Type: application/json
+Authorization: Basic {{token}}
+
+{
+  "name" : "Vlad Vladov",
+  "phone" : "+3756666666"
+}
+
+###Get All contacts
+
+GET http://localhost:8000/contacts/5e67a1a86af19c18fbae0542
+Authorization: Basic {{token}}
+
+###Get one user by id from mongodb
+GET http://localhost:8000/contacts/5e67a1bd6af19c18fbae0543
+Authorization: Basic {{token}}
+
+###Update user status
+PUT http://localhost:8000/contacts/5e67a63eda50dcbef27e5f24
+Content-Type: application/json
+Authorization: Basic {{token}}
+
+{
+  "status": "SUBSCRIBE",
+  "password": "123456789098765432"
+}
+
