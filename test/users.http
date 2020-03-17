@@ -58,6 +58,9 @@ Authorization: Basic {{token}}
 GET http://localhost:8000/token/new/status
 
 ###
+POST http://localhost:8080/v2/pet
+
+###
 
 
 

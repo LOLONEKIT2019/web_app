@@ -13,9 +13,6 @@ const (
 	FieldPassword = "password"
 	FieldStatus   = "status"
 	FieldModified = "modified"
-
-	Db_name          = "web"
-	Collection_users = "security"
 )
 
 func FindAllUsers() ([]*User, error) {

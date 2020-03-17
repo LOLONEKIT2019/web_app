@@ -5,15 +5,26 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 	"strings"
+	"../config"
 )
 
-func UsersRouter(w http.ResponseWriter, r *http.Request) {
+type userRouter struct {
+	cfg *config.Cfg
+}
+
+func NewUserRouter(cfg *config.Cfg)*userRouter{
+	return &userRouter{cfg: cfg}
+}
+
+func (h *userRouter)ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
 	path := strings.TrimSuffix(r.URL.Path, "/")
 
 	if path == "/users" {
 		switch r.Method {
 		case http.MethodGet:
-			UsersGetAll(w, r)
+			usersGetAll(w, r)
 			return
 		case http.MethodPost:
 			usersPostOne(w, r)

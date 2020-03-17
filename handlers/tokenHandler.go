@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"../config"
 	"../models"
 	. "../security"
 	"context"
@@ -12,8 +13,6 @@ import (
 	"strings"
 )
 
-const tokenKey = "MyApi"
-
 func bodyToAuthData(r *http.Request, auth *AuthData) error {
 	if r.Body == nil {
 		return errors.New("requset body is impte !")
@@ -22,38 +21,16 @@ func bodyToAuthData(r *http.Request, auth *AuthData) error {
 	return json.NewDecoder(r.Body).Decode(auth)
 }
 
-func CreateToken(w http.ResponseWriter, r *http.Request) {
-
-	user := new(AuthData)
-	err := bodyToAuthData(r, user)
-	if err != nil {
-		w.WriteHeader(http.StatusForbidden)
-		return
-	}
-
-	ok, err := CheckUser(user)
-	if err != nil || !ok {
-		w.WriteHeader(http.StatusUnauthorized)
-		return
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, models.Token{
-		Name:           user.Mail,
-		StandardClaims: jwt.StandardClaims{},
-	})
-	jwtToken, err := token.SignedString([]byte(tokenKey))
-	if err != nil {
-		postBodyResponse(w, http.StatusInternalServerError, jsonResponse{"error": "token_generation_failed"})
-		return
-	}
-
-	postBodyResponse(w, http.StatusOK, jsonResponse{"jwt": jwtToken})
-	return
+//auth
+type jwtAuthentication struct {
+	cfg *config.Cfg
 }
 
-func JwtAuthentication(next http.Handler) http.Handler {
+func NewJwtAuthentication(cfg *config.Cfg) *jwtAuthentication {
+	return &jwtAuthentication{cfg: cfg}
+}
+
+func (h *jwtAuthentication) JwtAuthentication(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -92,7 +69,7 @@ func JwtAuthentication(next http.Handler) http.Handler {
 		tk := models.Token{}
 
 		token, err := jwt.ParseWithClaims(tokenString, &tk, func(token *jwt.Token) (interface{}, error) {
-			return []byte(tokenKey), nil
+			return []byte(h.cfg.TokenKey), nil
 		})
 
 		if err != nil {
@@ -112,4 +89,44 @@ func JwtAuthentication(next http.Handler) http.Handler {
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r) //proceed in the middleware chain!
 	})
+}
+
+//get token
+type jwtToken struct {
+	cfg *config.Cfg
+}
+
+func NewJwtToken(cfg *config.Cfg) *jwtToken {
+	return &jwtToken{cfg: cfg}
+}
+
+func (h *jwtToken) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+
+	user := new(AuthData)
+	err := bodyToAuthData(r, user)
+	if err != nil {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	ok, err := CheckUser(user)
+	if err != nil || !ok {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, models.Token{
+		Name:           user.Mail,
+		StandardClaims: jwt.StandardClaims{},
+	})
+	jwtToken, err := token.SignedString([]byte(h.cfg.TokenKey))
+	if err != nil {
+		postBodyResponse(w, http.StatusInternalServerError, jsonResponse{"error": "token_generation_failed"})
+		return
+	}
+
+	postBodyResponse(w, http.StatusOK, jsonResponse{"jwt": jwtToken})
+	return
 }

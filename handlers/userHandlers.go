@@ -23,7 +23,7 @@ func bodyToUser(r *http.Request, u *User) error {
 
 }
 
-func UsersGetAll(w http.ResponseWriter, r *http.Request) {
+func usersGetAll(w http.ResponseWriter, _ *http.Request) {
 
 	users, err := FindAllUsers()
 	if err != nil {
